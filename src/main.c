@@ -6,7 +6,7 @@
 #define ARRAY_LENGTH(x) (sizeof(x) / sizeof(*x))
 #define LOG_ERROR(...) (fprintf(stderr, __VA_ARGS__))
 
-static const int integral_approximation_result_max_length = 256;
+static const size_t integral_approximation_result_max_length = 256;
 
 int logging_vprintf(char *format, va_list args_ptr) {
     int result = vprintf(format, args_ptr);
@@ -37,14 +37,14 @@ int read_double(double *result, const char *variable_name) {
     return 0;
 }
 
-void free_string_array(char **arr, int arr_length) {
-    for (int i = 0; i < arr_length; i++)
+void free_string_array(char **arr, size_t arr_length) {
+    for (size_t i = 0; i < arr_length; i++)
         free(arr[i]);
     free(arr);
 }
 
-int print_string_array(char **arr, int arr_length) {
-    for (int i = 0; i < arr_length; i++)
+int print_string_array(char **arr, size_t arr_length) {
+    for (size_t i = 0; i < arr_length; i++)
         if (logging_printf("%s\n", arr[i]) < 0)
             return -1;
     return 0;
@@ -136,11 +136,11 @@ char *create_integral_approximation_result(const struct interval_t *interval, un
 char **create_integral_approximation_result_array(
         const struct interval_t *interval,
         unsigned int *partition_count_arr,
-        int arr_length
+        size_t arr_length
 ) {
     char **results = logging_malloc(arr_length * sizeof(char *), "result array");
     if (!results) return NULL;
-    for (int i = 0; i < arr_length; i++) {
+    for (size_t i = 0; i < arr_length; i++) {
         results[i] = create_integral_approximation_result(interval, partition_count_arr[i]);
         if (!results[i]) {
             LOG_ERROR("Error occurred in experiment #%d\n", i);
@@ -153,7 +153,7 @@ char **create_integral_approximation_result_array(
 
 int main() {
     unsigned int partition_count_arr[] = {6, 10, 20, 100, 500, 1000};
-    int experiments_count = ARRAY_LENGTH(partition_count_arr);
+    size_t experiments_count = ARRAY_LENGTH(partition_count_arr);
     struct interval_t interval = {0.0, 0.0};
     if (read_interval(&interval) != 0) return 1;
     char **results = create_integral_approximation_result_array(
